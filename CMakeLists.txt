@@ -2,12 +2,14 @@ cmake_minimum_required(VERSION 3.12)
 
 set(PROJECT_NAME Tetris3D)
 
+project(${PROJECT_NAME})
+
 set(PROJECT_INCLUDES
-    
+    src/rendering/drawable_object.h
 )
 
 set(PROJECT_SOURCES
-    
+src/rendering/drawable_object.c
 )
 
 add_executable(${PROJECT_NAME}
