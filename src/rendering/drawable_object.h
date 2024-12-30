@@ -23,4 +23,3 @@ void load_object_vertices(DrawableObject* object);
 void set_render_properties(DrawableObject* object);
 void render_drawable_object(DrawableObject* object, unsigned int shader_program);
 void delete_drawable_object(DrawableObject* object);
-
