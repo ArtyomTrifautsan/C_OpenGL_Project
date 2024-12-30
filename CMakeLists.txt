@@ -6,10 +6,12 @@ project(${PROJECT_NAME})
 
 set(PROJECT_INCLUDES
     src/rendering/drawable_object.h
+    src/middleware/algebra/algebra.h
 )
 
 set(PROJECT_SOURCES
-src/rendering/drawable_object.c
+    src/rendering/drawable_object.c
+    src/middleware/algebra/algebra.c
 )
 
 add_executable(${PROJECT_NAME}

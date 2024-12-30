@@ -7,13 +7,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
+
+#include "../middleware/algebra/algebra.h"
 
 
 const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
+    "uniform mat4 model_matrix;\n"
     "void main()\n"
     "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "   gl_Position = model_matrix * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\0";
 
 const char *fragmentShaderSource = "#version 330 core\n"
@@ -89,6 +93,7 @@ void create_drawable_object(DrawableObject* object)
 
     load_object_vertices(object);
     set_render_properties(object);
+    set_default_position(object);
 
     // printf("<<<load_object_vertices finished\n");
 }
@@ -141,11 +146,38 @@ void set_render_properties(DrawableObject* object)
 }
 
 
+void set_default_position(DrawableObject* object)
+{
+    object->x = 0;
+    object->y = 0;
+    object->z = 0;
+
+    object->scale_x = 1;
+    object->scale_y = 1;
+    object->scale_z = 1;
+
+    object->rotate_x = 0;
+    object->rotate_y = 0;
+    object->rotate_z = 0;
+}
+
+
 void render_drawable_object(DrawableObject* object, unsigned int shader_program)
 {
     // printf(">>>render_drawable_object started\n");
 
-    // draw our first triangle
+    // Make model matrix
+    Matrix translate_matrix = get_translate_matrix(object);
+    Matrix scale_matrix = get_scale_matrix(object);
+    Matrix rotate_matrix = get_rotate_matrix(object);
+    Matrix model_matrix = get_model_matrix(&translate_matrix, &scale_matrix, &rotate_matrix);
+
+    // send model matrix to shader
+    glUseProgram(shader_program);
+    unsigned int transform_location = glGetUniformLocation(shader_program, "model_matrix");
+    glUniformMatrix4fv(transform_location, 1, GL_TRUE, model_matrix.matrix);
+
+    // draw object
     glUseProgram(shader_program);
     glBindVertexArray(object->VAO); 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -153,6 +185,155 @@ void render_drawable_object(DrawableObject* object, unsigned int shader_program)
     // printf("<<<render_drawable_object finished\n");
 }
 
+
+Matrix get_translate_matrix(DrawableObject* object)
+{
+    Matrix translate_matrix = create_matrix(4, 4);
+
+    set_matrix_element(&translate_matrix, 0, 0, 1.0f);
+    set_matrix_element(&translate_matrix, 0, 1, 0.0f);
+    set_matrix_element(&translate_matrix, 0, 2, 0.0f);
+    set_matrix_element(&translate_matrix, 0, 3, object->x);
+    set_matrix_element(&translate_matrix, 1, 0, 0.0f);
+    set_matrix_element(&translate_matrix, 1, 1, 1.0f);
+    set_matrix_element(&translate_matrix, 1, 2, 0.0f);
+    set_matrix_element(&translate_matrix, 1, 3, object->y);
+    set_matrix_element(&translate_matrix, 2, 0, 0.0f);
+    set_matrix_element(&translate_matrix, 2, 1, 0.0f);
+    set_matrix_element(&translate_matrix, 2, 2, 1.0f);
+    set_matrix_element(&translate_matrix, 2, 3, object->z);
+    set_matrix_element(&translate_matrix, 3, 0, 0.0f);
+    set_matrix_element(&translate_matrix, 3, 1, 0.0f);
+    set_matrix_element(&translate_matrix, 3, 2, 0.0f);
+    set_matrix_element(&translate_matrix, 3, 3, 1.0f);
+
+    return translate_matrix;
+}
+
+Matrix get_scale_matrix(DrawableObject* object)
+{
+    Matrix scale_matrix = create_matrix(4, 4);
+
+    set_matrix_element(&scale_matrix, 0, 0, object->scale_x);
+    set_matrix_element(&scale_matrix, 0, 1, 0.0f);
+    set_matrix_element(&scale_matrix, 0, 2, 0.0f);
+    set_matrix_element(&scale_matrix, 0, 3, 0.0f);
+    set_matrix_element(&scale_matrix, 1, 0, 0.0f);
+    set_matrix_element(&scale_matrix, 1, 1, object->scale_y);
+    set_matrix_element(&scale_matrix, 1, 2, 0.0f);
+    set_matrix_element(&scale_matrix, 1, 3, 0.0f);
+    set_matrix_element(&scale_matrix, 2, 0, 0.0f);
+    set_matrix_element(&scale_matrix, 2, 1, 0.0f);
+    set_matrix_element(&scale_matrix, 2, 2, object->scale_z);
+    set_matrix_element(&scale_matrix, 2, 3, 0.0f);
+    set_matrix_element(&scale_matrix, 3, 0, 0.0f);
+    set_matrix_element(&scale_matrix, 3, 1, 0.0f);
+    set_matrix_element(&scale_matrix, 3, 2, 0.0f);
+    set_matrix_element(&scale_matrix, 3, 3, 1.0f);
+
+    return scale_matrix;
+}
+
+Matrix get_rotate_matrix(DrawableObject* object)
+{
+    Matrix rotate_x_matrix = get_rotate_x_matrix(object);
+    Matrix rotate_y_matrix = get_rotate_y_matrix(object);
+    Matrix rotate_z_matrix = get_rotate_z_matrix(object);
+
+    Matrix rotate_matrix = create_matrix(4, 4);
+    rotate_matrix = multiply_matrices(&rotate_y_matrix, &rotate_x_matrix);
+    rotate_matrix = multiply_matrices(&rotate_z_matrix, &rotate_matrix);
+
+    return rotate_matrix;
+}
+
+Matrix get_rotate_x_matrix(DrawableObject* object)
+{
+    float rotate_x_in_radians = object->rotate_x * M_PI / 180;
+
+    Matrix rotate_x_matrix = create_matrix(4, 4);
+
+    set_matrix_element(&rotate_x_matrix, 0, 0, 1.0f);
+    set_matrix_element(&rotate_x_matrix, 0, 1, 0.0f);
+    set_matrix_element(&rotate_x_matrix, 0, 2, 0.0f);
+    set_matrix_element(&rotate_x_matrix, 0, 3, 0.0f);
+    set_matrix_element(&rotate_x_matrix, 1, 0, 0.0f);
+    set_matrix_element(&rotate_x_matrix, 1, 1, (float)cos(rotate_x_in_radians));
+    set_matrix_element(&rotate_x_matrix, 1, 2, -(float)sin(rotate_x_in_radians));
+    set_matrix_element(&rotate_x_matrix, 1, 3, 0.0f);
+    set_matrix_element(&rotate_x_matrix, 2, 0, 0.0f);
+    set_matrix_element(&rotate_x_matrix, 2, 1, (float)sin(rotate_x_in_radians));
+    set_matrix_element(&rotate_x_matrix, 2, 2, (float)cos(rotate_x_in_radians));
+    set_matrix_element(&rotate_x_matrix, 2, 3, 0.0f);
+    set_matrix_element(&rotate_x_matrix, 3, 0, 0.0f);
+    set_matrix_element(&rotate_x_matrix, 3, 1, 0.0f);
+    set_matrix_element(&rotate_x_matrix, 3, 2, 0.0f);
+    set_matrix_element(&rotate_x_matrix, 3, 3, 1.0f);
+
+    return rotate_x_matrix;
+}
+
+Matrix get_rotate_y_matrix(DrawableObject* object)
+{
+    float rotate_y_in_radians = object->rotate_y * M_PI / 180;
+
+    Matrix rotate_y_matrix = create_matrix(4, 4);
+
+    set_matrix_element(&rotate_y_matrix, 0, 0, (float)cos(rotate_y_in_radians));
+    set_matrix_element(&rotate_y_matrix, 0, 1, 0.0f);
+    set_matrix_element(&rotate_y_matrix, 0, 2, (float)sin(rotate_y_in_radians));
+    set_matrix_element(&rotate_y_matrix, 0, 3, 0.0f);
+    set_matrix_element(&rotate_y_matrix, 1, 0, 0.0f);
+    set_matrix_element(&rotate_y_matrix, 1, 1, 1.0f);
+    set_matrix_element(&rotate_y_matrix, 1, 2, 0.0f);
+    set_matrix_element(&rotate_y_matrix, 1, 3, 0.0f);
+    set_matrix_element(&rotate_y_matrix, 2, 0, -(float)sin(rotate_y_in_radians));
+    set_matrix_element(&rotate_y_matrix, 2, 1, 0.0f);
+    set_matrix_element(&rotate_y_matrix, 2, 2, (float)cos(rotate_y_in_radians));
+    set_matrix_element(&rotate_y_matrix, 2, 3, 0.0f);
+    set_matrix_element(&rotate_y_matrix, 3, 0, 0.0f);
+    set_matrix_element(&rotate_y_matrix, 3, 1, 0.0f);
+    set_matrix_element(&rotate_y_matrix, 3, 2, 0.0f);
+    set_matrix_element(&rotate_y_matrix, 3, 3, 1.0f);
+
+    return rotate_y_matrix;
+}
+
+Matrix get_rotate_z_matrix(DrawableObject* object)
+{
+    float rotate_z_in_radians = object->rotate_z * M_PI / 180;
+
+    Matrix rotate_z_matrix = create_matrix(4, 4);
+
+    set_matrix_element(&rotate_z_matrix, 0, 0, (float)cos(rotate_z_in_radians));
+    set_matrix_element(&rotate_z_matrix, 0, 1, -(float)sin(rotate_z_in_radians));
+    set_matrix_element(&rotate_z_matrix, 0, 2, 0.0f);
+    set_matrix_element(&rotate_z_matrix, 0, 3, 0.0f);
+    set_matrix_element(&rotate_z_matrix, 1, 0, (float)sin(rotate_z_in_radians));
+    set_matrix_element(&rotate_z_matrix, 1, 1, (float)cos(rotate_z_in_radians));
+    set_matrix_element(&rotate_z_matrix, 1, 2, 0.0f);
+    set_matrix_element(&rotate_z_matrix, 1, 3, 0.0f);
+    set_matrix_element(&rotate_z_matrix, 2, 0, 0.0f);
+    set_matrix_element(&rotate_z_matrix, 2, 1, 0.0f);
+    set_matrix_element(&rotate_z_matrix, 2, 2, 1.0f);
+    set_matrix_element(&rotate_z_matrix, 2, 3, 0.0f);
+    set_matrix_element(&rotate_z_matrix, 3, 0, 0.0f);
+    set_matrix_element(&rotate_z_matrix, 3, 1, 0.0f);
+    set_matrix_element(&rotate_z_matrix, 3, 2, 0.0f);
+    set_matrix_element(&rotate_z_matrix, 3, 3, 1.0f);
+
+    return rotate_z_matrix;
+}
+
+Matrix get_model_matrix(Matrix *translate_matrix, Matrix *scale_matrix, Matrix *rotate_matrix)
+{
+    Matrix model_matrix = create_matrix(4, 4);
+
+    model_matrix = multiply_matrices(scale_matrix, rotate_matrix);
+    model_matrix = multiply_matrices(translate_matrix, &model_matrix);
+
+    return model_matrix;
+}
 
 void delete_drawable_object(DrawableObject* object)
 {

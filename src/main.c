@@ -5,7 +5,12 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #include "rendering/drawable_object.h"
+
+#include "middleware/algebra/algebra.h"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -58,11 +63,25 @@ int main()
 
     // render loop
     // -----------
+    int flag = 1;
+    float step = 0.0005;
     while (!glfwWindowShouldClose(window))
     {
         // input
         // -----
         processInput(window);
+
+
+        square.rotate_x += 0.2;
+        square.rotate_y += 0.2;
+
+        if (flag > 600) flag = -610;
+        flag += 1;
+        
+
+        // square.x += 0.01;
+        // square.y += 0.01;
+
 
         // render
         // ------
@@ -71,6 +90,7 @@ int main()
 
 
         render_drawable_object(&square, shaderProgram);
+
  
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
