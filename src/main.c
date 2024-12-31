@@ -9,8 +9,8 @@
 #include <math.h>
 
 #include "rendering/drawable_object.h"
-
 #include "middleware/algebra/algebra.h"
+#include "camera.h"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -57,6 +57,9 @@ int main()
 
     unsigned int shaderProgram = load_shaders();
 
+    // Camera camera;
+    // camera = create_camera();
+
     DrawableObject square;
     create_drawable_object(&square);
 
@@ -72,8 +75,10 @@ int main()
         processInput(window);
 
 
-        square.rotate_x += 0.2;
-        square.rotate_y += 0.2;
+        // send_view_projection_matrix_to_shaders(&camera, shaderProgram);
+        
+        // square.rotate_x += 0.2;
+        // square.rotate_y += 0.2;
 
         if (flag > 600) flag = -610;
         flag += 1;

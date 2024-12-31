@@ -16,6 +16,8 @@ typedef struct
     float scale_x, scale_y, scale_z;
     float rotate_x, rotate_y, rotate_z;
 
+    Matrix model_matrix;
+
 } DrawableObject;
 
 
@@ -28,11 +30,21 @@ void set_default_position(DrawableObject* object);
 void render_drawable_object(DrawableObject* object, unsigned int shader_program);
 void delete_drawable_object(DrawableObject* object);
 
+void set_object_coords(DrawableObject* object, float x, float y, float z);
+void set_object_coord_x(DrawableObject* object, float x);
+void set_object_coord_y(DrawableObject* object, float y);
+void set_object_coord_z(DrawableObject* object, float z);
 
-Matrix get_translate_matrix(DrawableObject* object);
-Matrix get_scale_matrix(DrawableObject* object);
-Matrix get_rotate_matrix(DrawableObject* object);
-Matrix get_model_matrix(Matrix *translate_matrix, Matrix *scale_matrix, Matrix *rotate_matrix);
-Matrix get_rotate_x_matrix(DrawableObject* object);
-Matrix get_rotate_y_matrix(DrawableObject* object);
-Matrix get_rotate_z_matrix(DrawableObject* object);
+void set_object_scale(DrawableObject* object, float scale_x, float scale_y, float scale_z);
+void set_object_scale_x(DrawableObject* object, float scale_x);
+void set_object_scale_y(DrawableObject* object, float scale_y);
+void set_object_scale_z(DrawableObject* object, float scale_z);
+
+void set_object_rotate(DrawableObject* object, float rotate_x, float rotate_y, float rotate_z);
+void set_object_rotate_x(DrawableObject* object, float rotate_x);
+void set_object_rotate_y(DrawableObject* object, float rotate_y);
+void set_object_rotate_z(DrawableObject* object, float rotate_z);
+
+
+void update_model_matrix(DrawableObject* object);
+Matrix get_model_matrix(DrawableObject* object);

@@ -12,12 +12,26 @@
 #include "../middleware/algebra/algebra.h"
 
 
+void send_model_matrix_to_shaders(DrawableObject* object, unsigned int shader_program);
+void draw_object(DrawableObject* object, unsigned int shader_program);
+
+Matrix get_translate_matrix_to_model(DrawableObject* object);
+Matrix get_scale_matrix_to_model(DrawableObject* object);
+Matrix get_rotate_matrix_to_model(DrawableObject* object);
+Matrix get_rotate_x_matrix_to_model(DrawableObject* object);
+Matrix get_rotate_y_matrix_to_model(DrawableObject* object);
+Matrix get_rotate_z_matrix_to_model(DrawableObject* object);
+Matrix create_model_matrix(Matrix *translate_matrix, Matrix *scale_matrix, Matrix *rotate_matrix);
+
+
 const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
+    "layout (location = 0) in vec3 vertex_position;\n"
     "uniform mat4 model_matrix;\n"
+    // "uniform mat4 view_projection_matrix;\n"
     "void main()\n"
     "{\n"
-    "   gl_Position = model_matrix * vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    // "   gl_Position = view_projection_matrix * model_matrix * vec4(vertex_position, 1.0);\n"
+    "   gl_Position = model_matrix * vec4(vertex_position, 1.0);\n"
     "}\0";
 
 const char *fragmentShaderSource = "#version 330 core\n"
@@ -159,6 +173,8 @@ void set_default_position(DrawableObject* object)
     object->rotate_x = 0;
     object->rotate_y = 0;
     object->rotate_z = 0;
+
+    update_model_matrix(object);
 }
 
 
@@ -166,27 +182,31 @@ void render_drawable_object(DrawableObject* object, unsigned int shader_program)
 {
     // printf(">>>render_drawable_object started\n");
 
-    // Make model matrix
-    Matrix translate_matrix = get_translate_matrix(object);
-    Matrix scale_matrix = get_scale_matrix(object);
-    Matrix rotate_matrix = get_rotate_matrix(object);
-    Matrix model_matrix = get_model_matrix(&translate_matrix, &scale_matrix, &rotate_matrix);
+    send_model_matrix_to_shaders(object, shader_program);
 
-    // send model matrix to shader
-    glUseProgram(shader_program);
-    unsigned int transform_location = glGetUniformLocation(shader_program, "model_matrix");
-    glUniformMatrix4fv(transform_location, 1, GL_TRUE, model_matrix.matrix);
-
-    // draw object
-    glUseProgram(shader_program);
-    glBindVertexArray(object->VAO); 
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    draw_object(object, shader_program);
 
     // printf("<<<render_drawable_object finished\n");
 }
 
+void send_model_matrix_to_shaders(DrawableObject* object, unsigned int shader_program)
+{
+    // send model matrix to shaders
+    glUseProgram(shader_program);
+    unsigned int transform_location = glGetUniformLocation(shader_program, "model_matrix");
+    glUniformMatrix4fv(transform_location, 1, GL_TRUE, object->model_matrix.matrix);
+}
 
-Matrix get_translate_matrix(DrawableObject* object)
+void draw_object(DrawableObject* object, unsigned int shader_program)
+{
+    // draw object
+    glUseProgram(shader_program);
+    glBindVertexArray(object->VAO); 
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+
+Matrix get_translate_matrix_to_model(DrawableObject* object)
 {
     Matrix translate_matrix = create_matrix(4, 4);
 
@@ -210,7 +230,7 @@ Matrix get_translate_matrix(DrawableObject* object)
     return translate_matrix;
 }
 
-Matrix get_scale_matrix(DrawableObject* object)
+Matrix get_scale_matrix_to_model(DrawableObject* object)
 {
     Matrix scale_matrix = create_matrix(4, 4);
 
@@ -234,11 +254,11 @@ Matrix get_scale_matrix(DrawableObject* object)
     return scale_matrix;
 }
 
-Matrix get_rotate_matrix(DrawableObject* object)
+Matrix get_rotate_matrix_to_model(DrawableObject* object)
 {
-    Matrix rotate_x_matrix = get_rotate_x_matrix(object);
-    Matrix rotate_y_matrix = get_rotate_y_matrix(object);
-    Matrix rotate_z_matrix = get_rotate_z_matrix(object);
+    Matrix rotate_x_matrix = get_rotate_x_matrix_to_model(object);
+    Matrix rotate_y_matrix = get_rotate_y_matrix_to_model(object);
+    Matrix rotate_z_matrix = get_rotate_z_matrix_to_model(object);
 
     Matrix rotate_matrix = create_matrix(4, 4);
     rotate_matrix = multiply_matrices(&rotate_y_matrix, &rotate_x_matrix);
@@ -247,7 +267,7 @@ Matrix get_rotate_matrix(DrawableObject* object)
     return rotate_matrix;
 }
 
-Matrix get_rotate_x_matrix(DrawableObject* object)
+Matrix get_rotate_x_matrix_to_model(DrawableObject* object)
 {
     float rotate_x_in_radians = object->rotate_x * M_PI / 180;
 
@@ -273,7 +293,7 @@ Matrix get_rotate_x_matrix(DrawableObject* object)
     return rotate_x_matrix;
 }
 
-Matrix get_rotate_y_matrix(DrawableObject* object)
+Matrix get_rotate_y_matrix_to_model(DrawableObject* object)
 {
     float rotate_y_in_radians = object->rotate_y * M_PI / 180;
 
@@ -299,7 +319,7 @@ Matrix get_rotate_y_matrix(DrawableObject* object)
     return rotate_y_matrix;
 }
 
-Matrix get_rotate_z_matrix(DrawableObject* object)
+Matrix get_rotate_z_matrix_to_model(DrawableObject* object)
 {
     float rotate_z_in_radians = object->rotate_z * M_PI / 180;
 
@@ -325,7 +345,7 @@ Matrix get_rotate_z_matrix(DrawableObject* object)
     return rotate_z_matrix;
 }
 
-Matrix get_model_matrix(Matrix *translate_matrix, Matrix *scale_matrix, Matrix *rotate_matrix)
+Matrix create_model_matrix(Matrix *translate_matrix, Matrix *scale_matrix, Matrix *rotate_matrix)
 {
     Matrix model_matrix = create_matrix(4, 4);
 
@@ -333,6 +353,22 @@ Matrix get_model_matrix(Matrix *translate_matrix, Matrix *scale_matrix, Matrix *
     model_matrix = multiply_matrices(translate_matrix, &model_matrix);
 
     return model_matrix;
+}
+
+void update_model_matrix(DrawableObject* object)
+{
+    // Make model matrix
+    Matrix translate_matrix = get_translate_matrix_to_model(object);
+    Matrix scale_matrix = get_scale_matrix_to_model(object);
+    Matrix rotate_matrix = get_rotate_matrix_to_model(object);
+    Matrix model_matrix = create_model_matrix(&translate_matrix, &scale_matrix, &rotate_matrix);
+
+    object->model_matrix = model_matrix;
+}
+
+Matrix get_model_matrix(DrawableObject* object)
+{
+    return object->model_matrix;
 }
 
 void delete_drawable_object(DrawableObject* object)
@@ -347,4 +383,96 @@ void delete_drawable_object(DrawableObject* object)
     free(object->indices);
 
     // printf("<<<delete_drawable_object finished\n");
+}
+
+
+void set_object_coords(DrawableObject* object, float x, float y, float z)
+{
+    object->x = x;
+    object->y = y;
+    object->z = z;
+
+    update_model_matrix(object);
+}
+void set_object_coord_x(DrawableObject* object, float x)
+{
+    object->x = x;
+
+    update_model_matrix(object);
+}
+
+void set_object_coord_y(DrawableObject* object, float y)
+{
+    object->y = y;
+
+    update_model_matrix(object);
+}
+
+void set_object_coord_z(DrawableObject* object, float z)
+{
+    object->z = z;
+
+    update_model_matrix(object);
+}
+
+
+void set_object_scale(DrawableObject* object, float scale_x, float scale_y, float scale_z)
+{
+    object->scale_x = scale_x;
+    object->scale_y = scale_y;
+    object->scale_z = scale_z;
+
+    update_model_matrix(object);
+}
+
+void set_object_scale_x(DrawableObject* object, float scale_x)
+{
+    object->scale_x = scale_x;
+
+    update_model_matrix(object);
+}
+
+void set_object_scale_y(DrawableObject* object, float scale_y)
+{
+    object->scale_y = scale_y;
+
+    update_model_matrix(object);
+}
+
+void set_object_scale_z(DrawableObject* object, float scale_z)
+{
+    object->scale_z = scale_z;
+
+    update_model_matrix(object);
+}
+
+
+void set_object_rotate(DrawableObject* object, float rotate_x, float rotate_y, float rotate_z)
+{
+    object->rotate_x = rotate_x;
+    object->rotate_y = rotate_y;
+    object->rotate_z = rotate_z;
+
+    update_model_matrix(object);
+}
+
+void set_object_rotate_x(DrawableObject* object, float rotate_x)
+{
+    object->rotate_x = rotate_x;
+
+    update_model_matrix(object);
+}
+
+void set_object_rotate_y(DrawableObject* object, float rotate_y)
+{
+    object->rotate_y = rotate_y;
+
+    update_model_matrix(object);
+}
+
+void set_object_rotate_z(DrawableObject* object, float rotate_z)
+{
+    object->rotate_z = rotate_z;
+
+    update_model_matrix(object);
 }
