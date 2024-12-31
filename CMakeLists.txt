@@ -7,11 +7,13 @@ project(${PROJECT_NAME})
 set(PROJECT_INCLUDES
     src/rendering/drawable_object.h
     src/middleware/algebra/algebra.h
+    src/camera.h
 )
 
 set(PROJECT_SOURCES
     src/rendering/drawable_object.c
     src/middleware/algebra/algebra.c
+    src/camera.c
 )
 
 add_executable(${PROJECT_NAME}

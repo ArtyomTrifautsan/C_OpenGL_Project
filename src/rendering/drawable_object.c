@@ -27,11 +27,10 @@ Matrix create_model_matrix(Matrix *translate_matrix, Matrix *scale_matrix, Matri
 const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 vertex_position;\n"
     "uniform mat4 model_matrix;\n"
-    // "uniform mat4 view_projection_matrix;\n"
+    "uniform mat4 view_projection_matrix;\n"
     "void main()\n"
     "{\n"
-    // "   gl_Position = view_projection_matrix * model_matrix * vec4(vertex_position, 1.0);\n"
-    "   gl_Position = model_matrix * vec4(vertex_position, 1.0);\n"
+    "   gl_Position = view_projection_matrix * model_matrix * vec4(vertex_position, 1.0);\n"
     "}\0";
 
 const char *fragmentShaderSource = "#version 330 core\n"

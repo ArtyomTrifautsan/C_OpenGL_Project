@@ -57,8 +57,9 @@ int main()
 
     unsigned int shaderProgram = load_shaders();
 
-    // Camera camera;
-    // camera = create_camera();
+    Camera camera;
+    camera = create_camera();
+    set_camera_coords(&camera, 0.0f, 0.0f, -1.0f);
 
     DrawableObject square;
     create_drawable_object(&square);
@@ -68,32 +69,29 @@ int main()
     // -----------
     int flag = 1;
     float step = 0.0005;
+    float camera_z_pos = 0.0f;
+    float camera_y_rotate = 0.0f;
     while (!glfwWindowShouldClose(window))
     {
         // input
         // -----
         processInput(window);
-
-
-        // send_view_projection_matrix_to_shaders(&camera, shaderProgram);
         
-        // square.rotate_x += 0.2;
-        // square.rotate_y += 0.2;
 
         if (flag > 600) flag = -610;
         flag += 1;
+        camera_z_pos -= step * 10;
+        camera_y_rotate += step * 100;
         
-
-        // square.x += 0.01;
-        // square.y += 0.01;
-
+        set_camera_coords(&camera, 0.0f, 0.0f, camera_z_pos);
+        // set_camera_rotate_y(&camera, camera_y_rotate);
 
         // render
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-
+        send_view_projection_matrix_to_shaders(&camera, shaderProgram);
         render_drawable_object(&square, shaderProgram);
 
  
