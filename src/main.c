@@ -9,11 +9,15 @@
 #include <math.h>
 
 #include "rendering/drawable_object.h"
-#include "middleware/algebra/algebra.h"
-#include "camera.h"
+#include "rendering/camera.h"
+
+#include "data_structures/matrix/matrix.h"
+
+#include "input_keys.h"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow *window);
 
 
@@ -45,6 +49,9 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
+
+    // Callbacks
+    glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // glad: load all OpenGL function pointers
@@ -130,4 +137,25 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    switch (action)
+    {
+    case GLFW_PRESS:
+        printf("GLFW PRESS: %c\n", (char)key);
+        break;
+
+    case GLFW_RELEASE:
+        printf("GLFW RELEASE: %c\n", (char)key);
+        break;
+
+    case GLFW_REPEAT:
+        printf("GLFW REPEAT: %c\n", (char)key);
+        break;
+    
+    default:
+        break;
+    }
 }

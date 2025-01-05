@@ -9,8 +9,6 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include "../middleware/algebra/algebra.h"
-
 
 void send_model_matrix_to_shaders(DrawableObject* object, unsigned int shader_program);
 void draw_object(DrawableObject* object, unsigned int shader_program);

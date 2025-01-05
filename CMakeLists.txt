@@ -6,14 +6,22 @@ project(${PROJECT_NAME})
 
 set(PROJECT_INCLUDES
     src/rendering/drawable_object.h
-    src/middleware/algebra/algebra.h
-    src/camera.h
+    src/rendering/camera.h
+
+    src/data_structures/matrix/matrix.h
+    src/data_structures/dynamic_array/dynamic_array.h
+    src/data_structures/queue/queue.h
+
+    src/input_keys.h
 )
 
 set(PROJECT_SOURCES
     src/rendering/drawable_object.c
-    src/middleware/algebra/algebra.c
-    src/camera.c
+    src/rendering/camera.c
+
+    src/data_structures/matrix/matrix.c
+    src/data_structures/dynamic_array/dynamic_array.c
+    src/data_structures/queue/queue.c
 )
 
 add_executable(${PROJECT_NAME}

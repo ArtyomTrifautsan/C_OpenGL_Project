@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "middleware/algebra/algebra.h"
+#include "../data_structures/matrix/matrix.h"
 
 typedef struct {
     float x, y, z;
