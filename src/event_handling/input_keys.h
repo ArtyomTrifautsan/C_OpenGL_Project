@@ -1,7 +1,8 @@
 #pragma once
 
-enum KeyboardCode
+typedef enum 
 {
+    KEY_NONE              = -3,
 
     KEY_UNKNOWN           = -1,
 
@@ -131,10 +132,12 @@ enum KeyboardCode
 
     KEY_LAST              = KEY_MENU,
 
-};
+} KeyboardCode;
 
-enum MouseCode
+typedef enum 
 {
+    MOUSE_NONE            = -3,
+
     MOUSE_BUTTON_1        = 0,
     MOUSE_BUTTON_2        = 1,
     MOUSE_BUTTON_3        = 2,
@@ -147,4 +150,6 @@ enum MouseCode
     MOUSE_BUTTON_LEFT     = MOUSE_BUTTON_1,
     MOUSE_BUTTON_RIGHT    = MOUSE_BUTTON_2,
     MOUSE_BUTTON_MIDDLE   = MOUSE_BUTTON_3,
-};
+
+    MOUSE_LAST            = 12,
+} MouseCode;

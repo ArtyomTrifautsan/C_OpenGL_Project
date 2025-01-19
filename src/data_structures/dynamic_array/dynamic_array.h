@@ -8,16 +8,13 @@ typedef struct {
 } DynamicArray;
 
 
-DynamicArray create_dynamic_array(int capacity);
+DynamicArray create_darray(int capacity);
+void free_darray(DynamicArray* array);
 
-void darray_add_element_(DynamicArray* array, float element);
+void darray_add_element(DynamicArray* array, float element);
 float darray_remove_element(DynamicArray* array, int index);
 
-void print_dynamic_array(DynamicArray* array);
+void print_darray(DynamicArray* array);
 
-void free_array(DynamicArray* array);
-
-
-// NOT WORK
-// void set_element(DynamicArray* array, int index, int element);
-// int get_element(DynamicArray* array, int index);
+void darray_set_element(DynamicArray* array, int index, int element);
+float darray_get_element(DynamicArray* array, int index);

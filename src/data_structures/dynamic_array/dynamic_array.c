@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 
-DynamicArray create_dynamic_array(int capacity)
+DynamicArray create_darray(int capacity)
 {
     DynamicArray array;
 
@@ -57,7 +57,7 @@ float darray_remove_element(DynamicArray* array, int index)
     return removed_element;
 }
 
-int get_element(DynamicArray* array, int index)
+float darray_get_element(DynamicArray* array, int index)
 {
     if (index >= array->size)
     {
@@ -73,7 +73,7 @@ int get_element(DynamicArray* array, int index)
     
     return array->array[current_index];
 }
-void set_element(DynamicArray* array, int index, int element)
+void darray_set_element(DynamicArray* array, int index, int element)
 {
     if (index >= array->size)
     {
@@ -90,7 +90,7 @@ void set_element(DynamicArray* array, int index, int element)
     array->array[current_index] = element;
 }
 
-void print_dynamic_array(DynamicArray* array)
+void print_darray(DynamicArray* array)
 {
     printf("[");
     
@@ -111,7 +111,7 @@ void print_dynamic_array(DynamicArray* array)
     printf("]\n");
 }
 
-void free_array(DynamicArray* array)
+void free_darray(DynamicArray* array)
 {
     free(array->array);
     array->array = NULL;

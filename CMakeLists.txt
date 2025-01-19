@@ -9,10 +9,12 @@ set(PROJECT_INCLUDES
     src/rendering/camera.h
 
     src/data_structures/matrix/matrix.h
+    src/data_structures/array/array.h
     src/data_structures/dynamic_array/dynamic_array.h
     src/data_structures/queue/queue.h
 
-    src/input_keys.h
+    src/event_handling/input_keys.h
+    src/event_handling/event_handler.h
 )
 
 set(PROJECT_SOURCES
@@ -20,8 +22,11 @@ set(PROJECT_SOURCES
     src/rendering/camera.c
 
     src/data_structures/matrix/matrix.c
+    src/data_structures/array/array.c
     src/data_structures/dynamic_array/dynamic_array.c
     src/data_structures/queue/queue.c
+
+    src/event_handling/event_handler.c
 )
 
 add_executable(${PROJECT_NAME}

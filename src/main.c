@@ -13,7 +13,8 @@
 
 #include "data_structures/matrix/matrix.h"
 
-#include "input_keys.h"
+#include "event_handling/event_handler.h"
+#include "event_handling/input_keys.h"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -24,6 +25,9 @@ void processInput(GLFWwindow *window);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+
+// EVENT HANDLER
+EventHandler event_handler;
 
 
 int main()
@@ -62,6 +66,9 @@ int main()
         return -1;
     }
 
+    event_handler = create_event_handler();
+
+    // RENDER OBJECTS
     unsigned int shaderProgram = load_shaders();
 
     Camera camera;
@@ -75,22 +82,43 @@ int main()
     // render loop
     // -----------
     int flag = 1;
-    float step = 0.0005;
-    float camera_z_pos = 0.0f;
+    float step = 0.01;
+    float camera_z_pos = 1.0f;
     float camera_y_rotate = 0.0f;
     while (!glfwWindowShouldClose(window))
     {
         // input
         // -----
         processInput(window);
-        
 
-        if (flag > 600) flag = -610;
-        flag += 1;
-        camera_z_pos -= step * 10;
-        camera_y_rotate += step * 100;
+
+        if (is_keyboard_key_pressed(&event_handler, KEY_A) || is_keyboard_key_repeated(&event_handler, KEY_A))
+        {
+            camera.x += step;
+            set_camera_coord_x(&camera, camera.x += step);
+            printf("GLFW PRESS: a\n");
+        }
+        if (is_keyboard_key_pressed(&event_handler, KEY_S) || is_keyboard_key_repeated(&event_handler, KEY_S))
+        {
+            camera.z += step;
+            set_camera_coord_z(&camera, camera.z += step);
+            printf("GLFW PRESS: s\n");
+        }
+        if (is_keyboard_key_pressed(&event_handler, KEY_W) || is_keyboard_key_repeated(&event_handler, KEY_W))
+        {
+            camera.z -= step;
+            set_camera_coord_z(&camera, camera.z -= step);
+            printf("GLFW PRESS: w\n");
+        }
+
+        clear_event_storage(&event_handler);
+
+        // if (flag > 600) flag = -610;
+        // flag += 1;
+        // camera_z_pos -= step * 10;
+        // camera_y_rotate += step * 100;
         
-        set_camera_coords(&camera, 0.0f, 0.0f, camera_z_pos);
+        // set_camera_coords(&camera, 0.0f, 0.0f, camera_z_pos);
         // set_camera_rotate_y(&camera, camera_y_rotate);
 
         // render
@@ -101,7 +129,7 @@ int main()
         send_view_projection_matrix_to_shaders(&camera, shaderProgram);
         render_drawable_object(&square, shaderProgram);
 
- 
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
@@ -144,15 +172,18 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     switch (action)
     {
     case GLFW_PRESS:
-        printf("GLFW PRESS: %c\n", (char)key);
+        // printf("GLFW PRESS: %c\n", (char)key);
+        push_to_keyboard_pressed(&event_handler, key);
         break;
 
     case GLFW_RELEASE:
-        printf("GLFW RELEASE: %c\n", (char)key);
+        // printf("GLFW RELEASE: %c\n", (char)key);
+        push_to_keyboard_released(&event_handler, key);
         break;
 
     case GLFW_REPEAT:
-        printf("GLFW REPEAT: %c\n", (char)key);
+        // printf("GLFW REPEAT: %c\n", (char)key);
+        push_to_keyboard_repeated(&event_handler, key);
         break;
     
     default:
