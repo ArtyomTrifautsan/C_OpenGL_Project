@@ -16,5 +16,5 @@ float darray_remove_element(DynamicArray* array, int index);
 
 void print_darray(DynamicArray* array);
 
-void darray_set_element(DynamicArray* array, int index, int element);
+void darray_set_element(DynamicArray* array, int index, float element);
 float darray_get_element(DynamicArray* array, int index);

@@ -1,6 +1,7 @@
 #include "event_handler.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "input_keys.h"
 

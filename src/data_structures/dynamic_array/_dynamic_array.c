@@ -73,7 +73,7 @@ float darray_get_element(DynamicArray* array, int index)
     
     return array->array[current_index];
 }
-void darray_set_element(DynamicArray* array, int index, int element)
+void darray_set_element(DynamicArray* array, int index, float element)
 {
     if (index >= array->size)
     {

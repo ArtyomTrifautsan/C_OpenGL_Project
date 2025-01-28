@@ -8,8 +8,12 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#include "rendering/drawable_object.h"
+// #include "rendering/drawable_object.h"
 #include "rendering/camera.h"
+#include "rendering/shader_program.h"
+
+#include "resource_managing/load_model.h"
+#include "rendering/Model3D.h"
 
 #include "data_structures/matrix/matrix.h"
 
@@ -21,6 +25,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow *window);
 
+Model3D create_cube();
+
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -28,6 +34,12 @@ const unsigned int SCR_HEIGHT = 600;
 
 // EVENT HANDLER
 EventHandler event_handler;
+
+// Shader Program
+ShaderProgram default_shader_program;
+
+// Model
+Model3D tree_model;
 
 
 int main()
@@ -38,6 +50,8 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -66,17 +80,32 @@ int main()
         return -1;
     }
 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+
+
     event_handler = create_event_handler();
 
     // RENDER OBJECTS
-    unsigned int shaderProgram = load_shaders();
+    default_shader_program = load_shaders(
+        "Resources/Shaders/default_vertex_shader.txt",
+        "Resources/Shaders/default_fragment_shader.txt"
+    );
+    // default_shader_program = load_shaders("1.txt", "2.txt");
 
     Camera camera;
     camera = create_camera();
     set_camera_coords(&camera, 0.0f, 0.0f, -1.0f);
 
-    DrawableObject square;
-    create_drawable_object(&square);
+    tree_model = load_OBJ("Lampa234.obj", "Resources/Models/");
+
+    // Meshes
+    // for (int i = 0; i < tree_model.meshes.size; i++)
+    for (int i = 0; i < 1; i++)
+    {
+        print_mesh(&tree_model.meshes.array[i]);
+    }
 
 
     // render loop
@@ -94,19 +123,39 @@ int main()
 
         if (is_keyboard_key_pressed(&event_handler, KEY_A) || is_keyboard_key_repeated(&event_handler, KEY_A))
         {
-            camera.x += step;
-            set_camera_coord_x(&camera, camera.x += step);
+            // camera.x -= step;
+            set_camera_coord_x(&camera, camera.x -= step);
             printf("GLFW PRESS: a\n");
         }
+        if (is_keyboard_key_pressed(&event_handler, KEY_D) || is_keyboard_key_repeated(&event_handler, KEY_D))
+        {
+            // camera.x += step;
+            set_camera_coord_x(&camera, camera.x += step);
+            printf("GLFW PRESS: d\n");
+        }
+
+        if (is_keyboard_key_pressed(&event_handler, KEY_Q) || is_keyboard_key_repeated(&event_handler, KEY_Q))
+        {
+            // camera.y -= step;
+            set_camera_coord_y(&camera, camera.y -= step);
+            printf("GLFW PRESS: q\n");
+        }
+        if (is_keyboard_key_pressed(&event_handler, KEY_E) || is_keyboard_key_repeated(&event_handler, KEY_E))
+        {
+            // camera.y += step;
+            set_camera_coord_y(&camera, camera.y += step);
+            printf("GLFW PRESS: e\n");
+        }
+
         if (is_keyboard_key_pressed(&event_handler, KEY_S) || is_keyboard_key_repeated(&event_handler, KEY_S))
         {
-            camera.z += step;
+            // camera.z += step;
             set_camera_coord_z(&camera, camera.z += step);
             printf("GLFW PRESS: s\n");
         }
         if (is_keyboard_key_pressed(&event_handler, KEY_W) || is_keyboard_key_repeated(&event_handler, KEY_W))
         {
-            camera.z -= step;
+            // camera.z -= step;
             set_camera_coord_z(&camera, camera.z -= step);
             printf("GLFW PRESS: w\n");
         }
@@ -124,10 +173,12 @@ int main()
         // render
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        send_view_projection_matrix_to_shaders(&camera, shaderProgram);
-        render_drawable_object(&square, shaderProgram);
+        send_view_projection_matrix_to_shaders(&camera, default_shader_program);
+        send_scene_parameters_to_shaders(&camera, default_shader_program);
+        
+        render_model3D(&tree_model, default_shader_program);
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -140,9 +191,9 @@ int main()
     // ------------------------------------------------------------------------
 
 
-    delete_drawable_object(&square);
+    // delete_drawable_object(&square);
 
-    glDeleteProgram(shaderProgram);
+    glDeleteProgram(default_shader_program.shader_program);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
@@ -189,4 +240,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     default:
         break;
     }
+}
+
+
+Model3D create_cube()
+{
+    DynamicArrayMesh meshes;
+    meshes = create_darray_mesh(1);
+
+    
 }

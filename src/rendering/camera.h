@@ -3,6 +3,9 @@
 
 #include "../data_structures/matrix/matrix.h"
 
+#include "shader_program.h"
+
+
 typedef struct {
     float x, y, z;
     float scale_x, scale_y, scale_z;
@@ -19,7 +22,8 @@ typedef struct {
 
 
 Camera create_camera();
-void send_view_projection_matrix_to_shaders(Camera* camera, unsigned int shader_program);
+void send_view_projection_matrix_to_shaders(Camera* camera, ShaderProgram shader_program);
+void send_scene_parameters_to_shaders(Camera* camera, ShaderProgram shader_program);
 
 void update_view_matrix(Camera* camera);
 void update_projection_matrix(Camera* camera);

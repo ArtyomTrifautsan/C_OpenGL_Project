@@ -54,12 +54,45 @@ Camera create_camera()
 }
 
 
-void send_view_projection_matrix_to_shaders(Camera* camera, unsigned int shader_program)
+void send_view_projection_matrix_to_shaders(Camera* camera, ShaderProgram shader_program)
 {
     // send model matrix to shaders
-    glUseProgram(shader_program);
-    unsigned int view_projection_matrix_location = glGetUniformLocation(shader_program, "view_projection_matrix");
+    update_view_projection_matrix(camera);
+
+    glUseProgram(shader_program.shader_program);
+    unsigned int view_projection_matrix_location = glGetUniformLocation(shader_program.shader_program, "view_projection_matrix");
     glUniformMatrix4fv(view_projection_matrix_location, 1, GL_TRUE, get_view_projection_matrix(camera).matrix);
+}
+
+
+void send_scene_parameters_to_shaders(Camera* camera, ShaderProgram shader_program)
+{
+    glUseProgram(shader_program.shader_program);
+
+    glUniform3f(
+        glGetUniformLocation(shader_program.shader_program, "camera_position"), 
+        camera->x, camera->y, camera->z
+    );
+
+    glUniform3f(
+        glGetUniformLocation(shader_program.shader_program, "light_position"), 
+        5, 5, 5
+    );
+
+    glUniform1f(
+        glGetUniformLocation(shader_program.shader_program, "ambient_factor"), 
+        0.1
+    );
+
+    glUniform1f(
+        glGetUniformLocation(shader_program.shader_program, "diffuse_factor"), 
+        1.0
+    );
+
+    glUniform1f(
+        glGetUniformLocation(shader_program.shader_program, "specular_factor"), 
+        0.5
+    );
 }
 
 

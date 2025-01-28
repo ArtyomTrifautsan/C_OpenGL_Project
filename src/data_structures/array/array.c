@@ -80,3 +80,36 @@ void print_array(Array* array)
 
     printf("]\n");
 }
+
+int array_get_element(Array* array, int index)
+{
+    if (index >= array->size)
+    {
+        fprintf(stderr, "[Array: get_element]: can't get element: index out of range.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int current_index;
+    if (index < 0)
+        current_index = array->size + index;
+    else
+        current_index = index;
+    
+    return array->array[current_index];
+}
+void array_set_element(Array* array, int index, int element)
+{
+    if (index >= array->size)
+    {
+        fprintf(stderr, "[Array: set_element]: can't set element: index out of range.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int current_index;
+    if (index < 0)
+        current_index = array->size + index;
+    else
+        current_index = index;
+    
+    array->array[current_index] = element;
+}

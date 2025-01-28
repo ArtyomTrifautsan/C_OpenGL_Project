@@ -4,7 +4,7 @@
 #include "../data_structures/matrix/matrix.h"
 
 
-typedef struct 
+typedef struct DrawableObject
 {
     float *vertices;
     unsigned int *indices;
