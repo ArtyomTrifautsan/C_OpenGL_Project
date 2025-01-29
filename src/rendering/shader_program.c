@@ -27,7 +27,8 @@ ShaderProgram load_shaders(char* vertex_shader_filename, char* fragment_shader_f
     if (!success)
     {
         glGetShaderInfoLog(vertex_shader, 512, NULL, infoLog);
-        printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n");
+        printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED:\n");
+        printf("%s", infoLog);
     }
 
     // fragment shader
@@ -40,7 +41,8 @@ ShaderProgram load_shaders(char* vertex_shader_filename, char* fragment_shader_f
     if (!success)
     {
         glGetShaderInfoLog(fragment_shader, 512, NULL, infoLog);
-        printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n");
+        printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED:\n");
+        printf("%s", infoLog);
     }
     // link shaders
     unsigned int shader_program = glCreateProgram();
@@ -51,7 +53,8 @@ ShaderProgram load_shaders(char* vertex_shader_filename, char* fragment_shader_f
     glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(shader_program, 512, NULL, infoLog);
-        printf("ERROR::SHADER::PROGRAM::LINKING_FAILED\n");
+        printf("ERROR::SHADER::PROGRAM::LINKING_FAILED:\n");
+        printf("%s", infoLog);
     }
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);

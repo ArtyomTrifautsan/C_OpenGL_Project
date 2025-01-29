@@ -1,10 +1,9 @@
-#version 330 core
+#version 460
 
 in vec2 texture_pos;
 in vec3 frag_normal;
 in vec3 frag_position;
 
-out vec4 FragColor;
 
 uniform vec3 camera_position;
 uniform vec3 light_position;
@@ -20,8 +19,9 @@ uniform float shininess;
 
 uniform float alpha_channel;
 
-void main()
-{
+out vec4 fragment_color;
+
+void main() {
     // Ambient
     vec3 ambient = ambient_color * ambient_factor * light_color;
 
@@ -36,5 +36,6 @@ void main()
     float specular_value = pow(max(dot(normal, light_direction), 0.0), shininess);
     vec3 specular = specular_color * specular_factor * specular_value * light_color;
 
-    FragColor = vec4(ambient + diffuse + specular, alpha_channel);
-}
+    //fragment_color = texture(InTexture, texture_pos) * vec4(ambient + diffuse + specular, 1.f);
+    fragment_color = vec4(ambient + diffuse + specular, alpha_channel);
+};

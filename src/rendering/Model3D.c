@@ -173,6 +173,13 @@ void _send_material_to_shaders(Material* material, ShaderProgram shader_program)
 {
     glUseProgram(shader_program.shader_program);
 
+    printf("Sending data:\n");
+    printf("ambient_color: (%f), (%f), (%f)\n", material->ambient_color[0], material->ambient_color[1], material->ambient_color[2]);
+    printf("diffuse_color: (%f), (%f), (%f)\n", material->diffuse_color[0], material->diffuse_color[1], material->diffuse_color[2]);
+    printf("specular_color: (%f), (%f), (%f)\n", material->specular_color[0], material->specular_color[1], material->specular_color[2]);
+    printf("shininess: (%f)\n", material->shininess);
+    printf("alpha_channel: (%f)\n===\n", material->alpha_channel);
+
     // unsigned int ambient_color_location = glGetUniformLocation(shader_program.shader_program, "ambient_color");
     glUniform3f(
         glGetUniformLocation(shader_program.shader_program, "ambient_color"), 
@@ -199,7 +206,7 @@ void _send_material_to_shaders(Material* material, ShaderProgram shader_program)
         material->alpha_channel
     );
 }
-
+  
 
 void _draw_model3D(Model3D* model, ShaderProgram shader_program)
 {

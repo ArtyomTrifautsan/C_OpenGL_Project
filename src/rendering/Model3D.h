@@ -28,20 +28,20 @@ void _set_render_properties(Model3D* model);
 void _set_default_position(Model3D* model);
 void render_model3D(Model3D* model, ShaderProgram shader_program);
 
-void set_object_coords(Model3D* model, float x, float y, float z);
-void set_object_coord_x(Model3D* model, float x);
-void set_object_coord_y(Model3D* model, float y);
-void set_object_coord_z(Model3D* model, float z);
+void set_model_coords(Model3D* model, float x, float y, float z);
+void set_model_coord_x(Model3D* model, float x);
+void set_model_coord_y(Model3D* model, float y);
+void set_model_coord_z(Model3D* model, float z);
 
-void set_object_scale(Model3D* model, float scale_x, float scale_y, float scale_z);
-void set_object_scale_x(Model3D* model, float scale_x);
-void set_object_scale_y(Model3D* model, float scale_y);
-void set_object_scale_z(Model3D* model, float scale_z);
+void set_model_scale(Model3D* model, float scale_x, float scale_y, float scale_z);
+void set_model_scale_x(Model3D* model, float scale_x);
+void set_model_scale_y(Model3D* model, float scale_y);
+void set_model_scale_z(Model3D* model, float scale_z);
 
-void set_object_rotate(Model3D* model, float rotate_x, float rotate_y, float rotate_z);
-void set_object_rotate_x(Model3D* model, float rotate_x);
-void set_object_rotate_y(Model3D* model, float rotate_y);
-void set_object_rotate_z(Model3D* model, float rotate_z);
+void set_model_rotate(Model3D* model, float rotate_x, float rotate_y, float rotate_z);
+void set_model_rotate_x(Model3D* model, float rotate_x);
+void set_model_rotate_y(Model3D* model, float rotate_y);
+void set_model_rotate_z(Model3D* model, float rotate_z);
 
 
 void update_model_matrix(Model3D* model);

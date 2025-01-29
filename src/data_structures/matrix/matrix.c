@@ -33,11 +33,12 @@ float get_matrix_element(Matrix* mat, unsigned int row, unsigned int col) {
 
 // Function to print the matrix
 void print_matrix(Matrix* mat) {
+    printf("[");
     for (unsigned int i = 0; i < mat->n; i++) {
         for (unsigned int j = 0; j < mat->m; j++) {
             printf("%f ", get_matrix_element(mat, i, j));
         }
-        printf("\n");
+        printf("]\n");
     }
 }
 

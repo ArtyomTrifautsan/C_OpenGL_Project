@@ -1,4 +1,4 @@
-#version 330 core
+#version 460
 
 layout(location = 0) in vec3 vertex_position;
 layout(location = 1) in vec3 vertex_normal;
@@ -11,11 +11,10 @@ out vec2 texture_pos;
 out vec3 frag_normal;
 out vec3 frag_position;
 
-void main()
-{
+void main() {
     texture_pos = texture_position;
     frag_normal = mat3(transpose(inverse(model_matrix))) * vertex_normal;
     vec4 vertex_position_world = model_matrix * vec4(vertex_position, 1.0);
     frag_position = vertex_position_world.xyz;
     gl_Position = view_projection_matrix * vertex_position_world;
-}
+};

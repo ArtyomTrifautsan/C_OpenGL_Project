@@ -18,6 +18,9 @@ typedef struct {
 
     Matrix view_matrix, projection_matrix;
     Matrix view_projection_matrix;
+
+    Matrix _translate_matrix, _scale_matrix, _rotate_matrix;
+    Matrix _rotate_x_matrix, _rotate_y_matrix, _rotate_z_matrix;
 } Camera;
 
 
